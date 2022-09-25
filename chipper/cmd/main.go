@@ -28,17 +28,20 @@ var srv *grpcserver.Server
 var grpcIsRunning bool = false
 
 type chipperConfigStruct struct {
-	Port           string `json:"port"`
-	Cert           string `json:"cert"`
-	Key            string `json:"key"`
-	WeatherEnable  string `json:"weatherEnable"`
-	WeatherKey     string `json:"weatherKey"`
-	WeatherUnit    string `json:"weatherUnit"`
-	HoundifyEnable string `json:"houndifyEnable"`
-	HoundifyKey    string `json:"houndifyKey"`
-	HoundifyID     string `json:"houndifyID"`
-	SttService     string `json:"sttService"`
-	PicovoiceKey   string `json:"picovoiceKey"`
+	Port                  string `json:"port"`
+	Cert                  string `json:"cert"`
+	Key                   string `json:"key"`
+	WeatherEnable         string `json:"weatherEnable"`
+	WeatherKey            string `json:"weatherKey"`
+	WeatherUnit           string `json:"weatherUnit"`
+	HoundifyEnable        string `json:"houndifyEnable"`
+	HoundifyKey           string `json:"houndifyKey"`
+	HoundifyID            string `json:"houndifyID"`
+	SttService            string `json:"sttService"`
+	PicovoiceKey          string `json:"picovoiceKey"`
+	OpenWeatherAPIEnabled string `json:"openWeatherAPIEnabled"`
+	OpenWeatherAPIKey     string `json:"openWeatherAPIKey"`
+	OpenWeatherAPICountryCode string `json:"openWeatherAPICountryCode"`
 }
 
 func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
@@ -178,6 +181,9 @@ func main() {
 		chipperConfigReq.HoundifyEnable = os.Getenv("HOUNDIFY_ENABLED")
 		chipperConfigReq.HoundifyKey = os.Getenv("HOUNDIFY_CLIENT_KEY")
 		chipperConfigReq.HoundifyID = os.Getenv("HOUNDIFY_CLIENT_ID")
+		chipperConfigReq.OpenWeatherAPIEnabled = os.Getenv("OPENWEATHERAPI_ENABLED")
+		chipperConfigReq.OpenWeatherAPIKey = os.Getenv("OPENWEATHERAPI_KEY")
+		chipperConfigReq.OpenWeatherAPICountryCode = os.Getenv("OPENWEATHERAPI_CC")
 		chipperConfigBytes, _ := json.Marshal(chipperConfigReq)
 		os.WriteFile("./chipperConfig.json", chipperConfigBytes, 0644)
 		os.Rename("./source.sh", "old-source.sh")
@@ -228,6 +234,7 @@ func startServer() {
 		if chipperConfig.Cert == "./epod/ep.crt" {
 			exec.Command("/bin/touch", "./useepod").Run()
 		}
+		logger.Logger(fmt.Printf("%v", chipperConfig))
 		os.Setenv("DDL_RPC_PORT", chipperConfig.Port)
 		os.Setenv("DDL_RPC_TLS_CERTIFICATE", certString)
 		os.Setenv("DDL_RPC_TLS_KEY", keyString)
@@ -241,6 +248,9 @@ func startServer() {
 		os.Setenv("DEBUG_LOGGING", "true")
 		os.Setenv("STT_SERVICE", chipperConfig.SttService)
 		os.Setenv("PICOVOICE_APIKEY", chipperConfig.PicovoiceKey)
+		os.Setenv("OPENWEATHERAPI_ENABLED", chipperConfig.OpenWeatherAPIEnabled)
+		os.Setenv("OPENWEATHERAPI_KEY", chipperConfig.OpenWeatherAPIKey)
+		os.Setenv("OPENWEATHERAPI_CC", chipperConfig.OpenWeatherAPICountryCode)
 	}
 	var err error
 	srv, err = grpcserver.New(

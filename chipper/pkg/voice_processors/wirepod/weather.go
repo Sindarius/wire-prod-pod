@@ -122,6 +122,12 @@ func getWeather(location string, botUnits string) (string, string, string, strin
 }
 
 func weatherParser(speechText string, botLocation string, botUnits string) (string, string, string, string, string, string) {
+	
+	if os.Getenv("OPENWEATHERAPI_ENABLED") == "true" {
+		logger.Logger("Using Open Weather API")
+		return openWeatherParser(speechText, botLocation, botUnits)
+	}
+
 	var specificLocation bool
 	var apiLocation string
 	var speechLocation string

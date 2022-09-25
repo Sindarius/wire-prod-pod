@@ -352,6 +352,34 @@
         "CladType": "Rain"
     },
     {
+        "APIValue": "Thunderstorm", 
+        "CladType": "Thunderstorms"
+    },
+    {
+        "APIValue": "Drizzle", 
+        "CladType": "Rain"
+    },
+    {
+        "APIValue": "Rain", 
+        "CladType": "Rain"
+    },
+    {
+        "APIValue": "Snow", 
+        "CladType": "Snow"
+    },
+    {
+        "APIValue": "Atmosphere", 
+        "CladType": "Windy"
+    },
+    {
+        "APIValue": "Clear", 
+        "CladType": "Sunny"
+    },
+    {
+        "APIValue": "Clouds", 
+        "CladType": "Cloudy"
+    },
+    {
         "APIValue": "Partly cloudy", 
         "CladType": "Cloudy"
     }
