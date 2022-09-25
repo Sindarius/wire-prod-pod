@@ -64,7 +64,7 @@ func getOpenWeather(location string, botUnits string) (condition string, is_fore
 		if(strings.Count(location, ",") < 2){ 
 			location += "," + os.Getenv("OPENWEATHERAPI_CC")
 		}
-		
+		fmt.Println("Location " + location)
 		params := url.Values{}
 		params.Add("appid", weatherAPIKey)
 		params.Add("q", location)
@@ -77,6 +77,7 @@ func getOpenWeather(location string, botUnits string) (condition string, is_fore
 
 		if err != nil {
 			logger.Logger("Error getting data")
+			logger.Logger(url)
 			return
 		}
 
@@ -84,13 +85,13 @@ func getOpenWeather(location string, botUnits string) (condition string, is_fore
 		weatherResponse := openWeatherAPIResponse{}
 
 		err = json.NewDecoder(resp.Body).Decode(&weatherResponse)
-		logger.Logger(fmt.Sprintf("%v", weatherResponse))
-
-		if err != nil {
+		
+		if err != nil || len(weatherResponse.Weather) == 0 {
 			logger.Logger(err)
 			return
 		}
 
+		logger.Logger(fmt.Sprintf("%v", weatherResponse))
 		condition = weatherResponse.Weather[0].Main
 
 		var weatherAPICladMap weatherAPICladStruct
@@ -105,7 +106,7 @@ func getOpenWeather(location string, botUnits string) (condition string, is_fore
 		}
 
 		is_forecast = "false"
-		condition = weatherResponse.Weather[0].Main
+		
 		if botUnits == "F" {
 			temperature = fmt.Sprintf("%.0f", KToF(weatherResponse.Main.Temp))
 		} else {
@@ -124,7 +125,7 @@ func openWeatherParser(speechText string, botLocation string, botUnits string) (
 	var specificLocation bool
 	var apiLocation string
 	var speechLocation string
-	if strings.Contains(speechText, " in ") {
+	if strings.Contains(speechText, " in ") || strings.Contains(speechText, " and ") {
 		splitPhrase := strings.SplitAfter(speechText, " in ")
 		speechLocation = strings.TrimSpace(splitPhrase[1])
 		if len(splitPhrase) == 3 {
